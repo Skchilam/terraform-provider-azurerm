@@ -1,0 +1,50 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "3.75.0"  
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+
+  client_id       = "c1cd6156-8e0b-4ed1-b2fa-d3e7fae3919a"
+  client_secret   = "sek8Q~dDXuChQRvBdqigMjcaiLgP6dRzgFn55bNx"
+  tenant_id       = "1e8647b3-1bcf-4d17-9721-28853cbe413f"
+  subscription_id = "77b45418-7fb5-4763-bc5c-fa8dccc10889"
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = "experiment32"
+  location = "East US"  # Replace with your desired location
+}
+resource "azurerm_mysql_server" "example" {
+  name                = "krishna-mysqlserver123"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+
+  administrator_login          = "mysqladminun"
+  administrator_login_password = "H@Sh1CoR3!"
+
+  sku_name   = "GP_Gen5_2"
+  storage_mb = 5120
+  version    = "5.7"
+
+  auto_grow_enabled                 = true
+  backup_retention_days             = 7
+  geo_redundant_backup_enabled      = true
+  infrastructure_encryption_enabled = true
+  public_network_access_enabled     = false
+  ssl_enforcement_enabled           = true
+  ssl_minimal_tls_version_enforced  = "TLS1_2"
+}
+
+resource "azurerm_mysql_database" "example" {
+  name                = "exampledb"
+  resource_group_name = azurerm_resource_group.example.name
+  server_name         = azurerm_mysql_server.example.name
+  charset             = "utf8"
+  collation           = "utf8_unicode_ci"
+}
